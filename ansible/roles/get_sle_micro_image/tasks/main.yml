@@ -1,0 +1,18 @@
+---
+- name: Create cache dir
+  ansible.builtin.file:
+    path: "{{ sle_micro.cache.images }}"
+    state: directory
+    mode: "0755"
+
+- name: Download sle_micro image to cache if needed
+  ansible.builtin.get_url:
+    dest: "{{ sle_micro_image.cached }}"
+    url: "{{ sle_micro_image.url }}"
+    mode: "0644"
+  register: sle_micro_image_download
+
+- name: Report image that was downloaded
+  ansible.builtin.debug:
+    msg: >-
+      Selected image available as '{{ sle_micro_image.cached }}'

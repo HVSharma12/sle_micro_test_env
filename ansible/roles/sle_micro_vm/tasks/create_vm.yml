@@ -1,0 +1,70 @@
+---
+# tasks file for vm creation
+
+- name: Cleanup existing VN {{ sle_micro_vm.name }}
+  ansible.builtin.include_tasks: cleanup_vm.yml
+
+- name: Install sle_micro VM backing image
+  become: true
+  ansible.builtin.copy:
+    src: "{{ sle_micro_image.cached }}"
+    dest: "{{ sle_micro_vm.image.backing }}"
+    mode: "0644"
+    remote_src: true
+
+- name: Create ignition config file
+  become: true
+  ansible.builtin.template:
+    src: "{{ sle_micro_vm.ignition.template }}"
+    dest: "{{ sle_micro_vm.ignition.file }}"
+    mode: "0600"
+
+- name: Create VM {{ sle_micro_vm.name }}
+  become: true
+  ansible.builtin.command: >-
+    virt-install
+      --connect qemu:///system
+      --import
+      --name {{ sle_micro_vm.name }}
+      --boot hd
+      --osinfo {{ sle_micro_vm.os_variant }}
+      --virt-type kvm
+      --hvm
+      --machine {{ sle_micro_vm.hardware.machine }}
+      --ram {{ sle_micro_vm.hardware.ram_mb }}
+      --vcpus {{ sle_micro_vm.hardware.vcpus }}
+      --cpu {{ sle_micro_vm.hardware.cpu_type }}
+      --video {{ sle_micro_vm.hardware.video }}
+      --console pty,target_type=virtio
+      --graphics vnc,listen=0.0.0.0
+      --rng /dev/urandom
+    {% if sle_micro_vm.hardware.bus == 'scsi' %}
+      --controller type=scsi,model=virtio-scsi
+    {% endif %}
+    {% for _net in sle_micro_vm.nics %}
+    {%   set _netparams = [_net.nettype ~ '=' ~ _net.netdev] %}
+    {%   if _net.mac is defined %}
+    {%     set _ = _netparams.append('mac=' ~ _net.mac) %}
+    {%   endif %}
+      --network {{ _netparams | join(',') }}
+    {% endfor %}
+    {% if false %}
+      --network network=default
+    {% endif %}
+      --tpm backend.type=emulator,backend.version={{ sle_micro_vm.tpm.version }},model={{ sle_micro_vm.tpm.model }}
+      --sysinfo type=fwcfg,entry0.name="opt/com.coreos/config",entry0.file="{{ sle_micro_vm.ignition.file}}"
+      --disk path={{ sle_micro_vm.image.file }},size={{ sle_micro_vm.image.size_gb }},backing_store={{
+          sle_micro_vm.image.backing }},backing_format=qcow2,bus={{ sle_micro_vm.hardware.bus }},cache=none,serial={{
+          'sle_micro-' ~ (sle_micro_vm.name[0:15] | upper) }}
+    {% for _disk in sle_micro_vm.extra_disks %}
+      --disk path={{ sle_micro_vm.image.file | replace(sle_micro_vm.name, sle_micro_vm.name ~ '_' ~ _disk.name) }},size={{
+          _disk.size_gb | default(100) }},bus={{ sle_micro_vm.hardware.bus }},cache=none,serial={{
+            'sle_micro-' ~ (_disk.name[0:15] | upper) }}
+    {% endfor %}
+      --noautoconsole
+  changed_when: false
+  register: virt_install_result
+
+- name: Show results for creation of VM {{ sle_micro_vm.name }}
+  ansible.builtin.debug:
+    var: virt_install_result

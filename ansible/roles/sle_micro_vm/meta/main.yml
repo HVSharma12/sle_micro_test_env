@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: sle_micro_vm
+  author: fmccarthy@suse.com
+  description: Manage sle_micro VMs using Libvirt
+  company: SUSE
+  license: Apache
+  min_ansible_version: "6.0"
+  platforms:
+    - name: opensuse
+      versions:
+        - "15.4"
+    - name: Ubuntu
+      versions:
+        - jammy
+  galaxy_tags: []
+
+dependencies:
+  - role: setup_ssh
+  - role: sle_micro_image_details

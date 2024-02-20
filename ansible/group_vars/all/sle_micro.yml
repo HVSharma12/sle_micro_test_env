@@ -1,0 +1,26 @@
+---
+# Use a cache dir in /var/tmp to avoid path resolution issues
+# when switching between different users.
+sle_micro_cache_dir: "{{ ['', 'var', 'tmp', 'sle_micro'] | join('/') }}"
+_sle_micro_arch: "{{ sle_micro_arch | default('x86_64') }}"
+
+sle_micro:
+  image_base_urls:
+    build: https://updates.suse.com/SUSE/Products/sle_micro-Dolomite/1.0/{{ _sle_micro_arch }}/
+    snapshot: https://updates.suse.com/SUSE/Products/sle_micro-Dolomite/1.0/{{ _sle_micro_arch }}/
+  build_types:
+    - build
+    - snapshot
+  image_types:
+    - Default-encrypted
+    - Default-qcow
+    - Default
+  extension:
+    - qcow2
+    - raw
+    - raw.xz
+  sle_micro_arch:
+    - x86_64
+  cache:
+    images: "{{ [sle_micro_cache_dir, 'images'] | join('/') }}"
+    workloads: "{{ [sle_micro_cache_dir, 'workloads'] | join('/') }}"

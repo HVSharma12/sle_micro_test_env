@@ -1,0 +1,20 @@
+---
+
+workloads:
+
+  # podman pull registry.opensuse.org/suse/alp/workloads/tumbleweed_containerfiles/suse/alp/workloads/ansible:latest
+  - name: ansible
+    container:
+      name: ansible
+      registry: registry.opensuse.org
+      path: suse/alp/workloads/tumbleweed_containerfiles/suse/alp/workloads
+      version: latest
+    labels:
+      install: install
+      uninstall: uninstall
+    packages:
+      - kernel-default  # need complete set of kernel modules
+      - "-kernel-default-base"  # remove to avoid conflict
+      - python3-libvirt-python  # needed by community.libvirt
+      - python3-lxml  # needed by community.libvirt.virt_net
+      - python3-rpm  # needed by ansible.builtin.package_facts

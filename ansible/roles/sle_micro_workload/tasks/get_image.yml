@@ -1,0 +1,66 @@
+---
+- name: Pull container image for workload {{ sle_micro_workload.name }}
+  delegate_to: "{{ groups.sle_micro_vms | first }}"
+  run_once: true
+  containers.podman.podman_image:
+    name: "{{ sle_micro_workload.image }}"
+    state: present
+  register: workload_image_pull
+
+- name: Gather info about image for workload {{ sle_micro_workload.name }}
+  delegate_to: "{{ groups.sle_micro_vms | first }}"
+  run_once: true
+  containers.podman.podman_image_info:
+    name: "{{ sle_micro_workload.image }}"
+  register: workload_image_info
+
+- name: Check if container image already saved for workload {{ sle_micro_workload.name }}
+  delegate_to: "{{ groups.sle_micro_vms | first }}"
+  run_once: true
+  ansible.builtin.stat:
+    path: "{{ workload_image.file.path }}"
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: workload_image_file_check
+
+- name: Save container image for workload {{ sle_micro_workload.name }}
+  delegate_to: "{{ groups.sle_micro_vms | first }}"
+  run_once: true
+  containers.podman.podman_save:
+    image: "{{ sle_micro_workload.image }}"
+    dest: "{{ workload_image.file.path }}"
+    force: false
+  register: workload_image_save
+  when:
+    - not workload_image_file_check.stat.exists
+
+- name: Fetch saved image to local cache for workload {{ sle_micro_workload.name }}
+  delegate_to: "{{ groups.sle_micro_vms | first }}"
+  run_once: true
+  ansible.builtin.fetch:
+    dest: "{{ workload_image.file.path | dirname }}/"
+    src: "{{ workload_image.file.path }}"
+    flat: true
+
+- name: Copy saved image from local cache for workload {{ sle_micro_workload.name }}
+  ansible.builtin.copy:
+    src: "{{ workload_image.file.path }}"
+    dest: "{{ workload_image.file.path | dirname }}"
+    mode: "0644"
+  when:
+    - inventory_hostname != (groups.sle_micro_vms | first)
+  register: workload_image_cache_copy
+
+- name: Load container image for workload {{ sle_micro_workload.name }}
+  containers.podman.podman_load:
+    input: "{{ workload_image.file.path }}"
+  register: workload_image_save
+  when:
+    - inventory_hostname != (groups.sle_micro_vms | first)
+
+- name: Load container image as root for workload {{ sle_micro_workload.name }}
+  become: true
+  containers.podman.podman_load:
+    input: "{{ workload_image.file.path }}"
+  register: workload_image_save

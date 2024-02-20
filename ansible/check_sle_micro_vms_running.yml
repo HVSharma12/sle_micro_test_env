@@ -1,0 +1,30 @@
+---
+
+- import_playbook: define_libvirt_host.yml
+- import_playbook: define_sle_micro_vms_group.yml
+
+- hosts: libvirt_host
+  tasks:
+    - name: Wait for sle_micro VM IPs to be pingable
+      command: >-
+        ping -c 1 -W 0.1 {{ item.ip }}
+      register: ping_cmd
+      loop: "{{ managed_vms }}"
+      until:
+        - ping_cmd is success
+      retries: 30
+      delay: 2
+
+    - name: Wait for SSH on sle_micro VMs to be responding
+      ansible.builtin.wait_for:
+        port: 22
+        host: "{{ item.ip }}"
+        search_regex: OpenSSH
+      loop: "{{ managed_vms }}"
+
+- hosts: sle_micro_vms
+  gather_facts: false
+  tasks:
+
+    - name: Check that sle_micro VMs are available
+      ping:

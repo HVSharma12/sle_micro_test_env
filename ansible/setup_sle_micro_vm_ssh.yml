@@ -1,0 +1,22 @@
+---
+- import_playbook: define_sle_micro_vms_group.yml
+
+- name: Setup SSH on sle_micro VMs for root
+  hosts: sle_micro_vms
+  gather_facts: false
+  vars:
+    ansible_user: root
+  tasks:
+    - name: Configure SSH for root
+      ansible.builtin.include_role:
+        name: setup_ssh
+        tasks_from: install.yml
+
+- name: Setup SSH on sle_micro VMs for user {{ vm_mgmt_user }}
+  hosts: sle_micro_vms
+  gather_facts: false
+  tasks:
+    - name: Configure SSH for user {{ vm_mgmt_user }}
+      ansible.builtin.include_role:
+        name: setup_ssh
+        tasks_from: install.yml

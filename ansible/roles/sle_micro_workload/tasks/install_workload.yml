@@ -1,0 +1,24 @@
+---
+- name: Ensure cache directory exists for workload {{ sle_micro_workload.name }}
+  ansible.builtin.file:
+    path: "{{ sle_micro.cache.workloads }}"
+    state: directory
+    mode: "0755"
+
+- name: Check if container already available as root for workload {{ sle_micro_workload.name }}
+  become: true
+  containers.podman.podman_image_info:
+    name: "{{ sle_micro_workload.name }}"
+  register: workload_image_info
+
+- name: Retrieve container for workload {{ sle_micro_workload.name }}
+  ansible.builtin.include_tasks: get_image.yml
+  when:
+    - (workload_image_info.images | length) == 0
+
+- name: Install container tools for workload {{ sle_micro_workload.name }}
+  become: true
+  ansible.builtin.command: >-
+    podman container runlabel {{ sle_micro_workload.labels.install }} {{ sle_micro_workload.image }}
+  changed_when: false
+  register: workload_runlabel_install

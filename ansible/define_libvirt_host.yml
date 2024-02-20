@@ -1,0 +1,20 @@
+---
+
+#
+# Dynamically define the libvirt_host node as either the local system
+# (the default) or a remote system when the appropriate settings are
+# defined.
+#
+
+- name: Dynamically define libvirt_host
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+
+    - name: Define libvirt_host if not already defined
+      ansible.builtin.include_role:
+        name: libvirt_host
+        tasks_from: define_libvirt_host.yml
+      when:
+        - ('libvirt_hosts' not in groups)

@@ -1,0 +1,14 @@
+---
+- name: Setup sle_micro SSH keys
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Generate sle_micro SSH keys
+      ansible.builtin.include_role:
+        name: setup_ssh
+        tasks_from: create_keys.yml
+
+    - name: Generate sle_micro SSH config
+      ansible.builtin.include_role:
+        name: setup_ssh
+        tasks_from: sle_micro_config.yml

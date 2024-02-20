@@ -1,0 +1,12 @@
+---
+- import_playbook: check_config_settings.yml
+- import_playbook: setup_sle_micro_ssh.yml
+- import_playbook: setup_libvirt_host.yml
+- import_playbook: get_sle_micro_image.yml
+- import_playbook: create_sle_micro_vnets.yml
+- import_playbook: create_sle_micro_vms.yml
+- import_playbook: check_sle_micro_vms_running.yml
+- import_playbook: setup_sle_micro_vm_ssh.yml
+- import_playbook: grow_root_filesystem.yml
+- import_playbook: setup_sle_micro_packages.yml
+- import_playbook: setup_sle_micro_workloads.yml

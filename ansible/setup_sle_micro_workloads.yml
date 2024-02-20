@@ -1,0 +1,13 @@
+---
+- import_playbook: define_sle_micro_vms_group.yml
+
+- hosts: sle_micro_vms
+  gather_facts: false
+  tasks:
+    - name: Setup specified workloads
+      include_role:
+        name: sle_micro_workload
+        tasks_from: install_workload.yml
+      loop_control:
+        loop_var: workload
+      loop: "{{ workloads | default(sle_micro_defaults.workloads) }}"

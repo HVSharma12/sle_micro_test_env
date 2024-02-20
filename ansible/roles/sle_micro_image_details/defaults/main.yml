@@ -1,0 +1,9 @@
+---
+_sle_micro_image_name: "sle_micro"
+
+_sle_micro_image_url: https://updates.suse.com/SUSE/Products/SLE-Micro/5.5/x86_64/SLE-Micro.x86_64-5.5.0-Default-qcow-GM.qcow2?D7bbac1VBWn6lJKctt-3AL4R7NECH1hZ5CZ5WBCpF-3HU0qRJfwwDASoXX4_M4JIN3jDPh4q2-cV9LjbyYEqdvm95dkTDyYAXRK0o66LcC_EiWLhmxtCs7ae6j3zWmWwb9ZDuSXrkiHNyjWFO381dw1BxaiSChz2mGhpFPP6m1MX-7I7uHfFUA
+
+sle_micro_image:
+  name: "{{ _sle_micro_image_name }}"
+  url: "{{ _sle_micro_image_url }}"
+  cached: "{{ sle_micro.cache.images }}/{{ _sle_micro_image_name }}"

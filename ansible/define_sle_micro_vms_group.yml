@@ -1,0 +1,19 @@
+---
+#
+# Dynamically define the sle_micro_vms group based upon settings/vms.yml
+# VM configuration.
+#
+
+- name: Dynamically define sle_micro VMs group
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - setup_ssh
+  tasks:
+    - name: Define sle_micro_vms group if not already defined
+      ansible.builtin.include_role:
+        name: sle_micro_vm
+        tasks_from: define_sle_micro_vms.yml
+      when:
+        - ('sle_micro_vms' not in groups)

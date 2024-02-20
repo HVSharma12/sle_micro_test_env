@@ -1,0 +1,6 @@
+---
+- name: Generate SSH config for sle_micro VMs
+  ansible.builtin.template:
+    dest: "{{ [setup_ssh_key.path.local, setup_ssh_key.config.file] | join('/') }}"
+    src: "sle_micro_config.j2"
+    mode: "{{ setup_ssh_key.config.mode }}"
