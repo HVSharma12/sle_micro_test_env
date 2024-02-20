@@ -17,4 +17,3 @@ galaxy_info:
 
 dependencies:
   - role: setup_ssh
-  - role: sle_micro_image_details

@@ -4,21 +4,6 @@ This repo provides a framework for bringing up one of more sle_micro VMs, via
 libvirt, in a repeatable fashion.
 
 
-# Ensuring that a viable version of Ansible is available
-
-To be able to use these tools you will need a recent version of
-Ansible, based upon ansible-core 2.13.x (Ansible 6.x) or newer.
-
-If needed, you can use the `bin/create-venv` helper script to create
-a Python venv with the latest version of Ansible that is compatible
-with your system's Python version, which will make all of the Ansible
-commands available under the `bin/` directory.
-
-The example commands, shown below, assume that the venv is being using,
-so the Ansible commands will be prefixed by `bin/`; remove this if you
-have an appropriate Ansible version already available.
-
-
 # Quick Start
 
 Assuming you have an appropriate version of Ansible available, with
@@ -27,7 +12,7 @@ requirements) to quickly get started you can create an sle_micro test env
 by running the `ansible/test_env_create.yml` playbook, like so:
 
 ```shell
-$ bin/ansible-playbook ansible/test_env_create.yml
+$ ansible-playbook ansible/test_env_create.yml -e sle_micro_image_path=$IMAGEPATH
 ```
 
 Doing so will automatically setup the `vms.yml` and `vnets.yml` files
@@ -40,7 +25,7 @@ with the Ansible workload for sle_micro installed, that you can log in to using
 the generated SSH config file, `ssh/config`, as follows:
 
 ```shell
-$ ssh -F ssh/config sle_microtestvm
+$ ssh -F ssh/config sle_micro
 ```
 
 Re-running the `ansible/test_env_create.yml` playbook will destroy and
@@ -50,7 +35,7 @@ If you want to completely cleanup all of these resources you can run
 the `ansible/test_env_cleanup.yml` playbook as follows:
 
 ```shell
-$ bin/ansible-playbook ansible/test_env_create.yml
+$ ansible-playbook ansible/test_env_create.yml
 ```
 
 See below for further details on requirements, using a remote Libvirt
@@ -68,19 +53,6 @@ NOTE: The Ansible commands must have viable Python Libvirt support.
 Tested with Ansible installed in a virtualenv (see below):
   * Ansible meta package version 6.7.0
   * Ansible core version 2.13.7
-
-### Ansible Virtualenv
-
-A helper script, `bin/create-venv` is available that can be used to
-create a Python virtualenv with an appropriate version of Ansible,
-Ansible Lint, and their dependent packages installed. The virtualenv
-is created with access to host site packages enabled so that it can
-leverage the system Python Libvirt integration support.
-
-The `bin/create-venv` also creates symlinks under the `bin` directory
-for all of the Ansible commands provided by the virtualenv, allowing
-those commands to be run by simply prefixing them with `bin/` when
-cd'd to the top-level directory of this repo.
 
 ### Ansible Collection Requirements
 
@@ -118,13 +90,6 @@ the required settings files, the example versions will be used to create
 these files automatically but those example settings could potentially
 conflict with other network resources so please check they are correct.
 
-## Ansible
-
-If you don't already have a suitable version of Ansible available, you
-can run `bin/create-venv` to create an appropriatlely setup virtualenv,
-with all of the relevant Ansible commands symlinked under the `bin`
-directory.
-
 ## Remote Libvirt host
 
 Setup the `libvirt_host.yml` if you want to use a remote Libvirt host.
@@ -151,7 +116,7 @@ though the actual names used can be customised.
 
 ## Creating a Test Env
 
-Run `bin/ansible-playbook ansible/sle_micro_create.yml` to create the VMs,
+Run `ansible-playbook ansible/sle_micro_create.yml -e sle_micro_image_path=$IMAGEPATH ` to create the VMs,
 and associated libvirt networking infrastructure, on the target Libvirt
 host, as specified by the configured `settings/*.yml` files.
 
@@ -180,7 +145,7 @@ For example, assuming default VM config settings, you could SSH to the
 *sle_micro* VM, running locally or on a remote Libvirt host as follows:
 
 ```
-% ssh -F ssh/config sle_microt
+% ssh -F ssh/config sle_micro
 Last login: Thu Feb 16 20:45:09 UTC 2023 from 192.168.187.1 on ssh
 Have a lot of fun...
 sle_micro@sle_micro:~>
@@ -197,10 +162,3 @@ the `settings/*.yml` files that may have been created.
 Some `# noqa ...` comment markers exist in the code to explicitly ignore
 certain rules, such as complaints that handlers should be used for actions
 that run because something has changed.
-
-
-# Future Enhancements
-
-TODO:
-  * Finish off support for kvm_encrypted VM type.
-  * After bringing up sle_micro VMs mount extra disks on specified mount points

@@ -17,3 +17,12 @@ sle_micro_defaults:
         - python3-libvirt-python # needed by community.libvirt
         - python3-lxml # needed by community.libvirt.virt_net
         - python3-rpm # needed by ansible.builtin.package_facts
+
+sle_micro_image_name: "sle_micro"
+
+sle_micro_image_path: ""
+
+sle_micro_image:
+  name: "{{ sle_micro_image_name }}"
+  path: "{{ sle_micro_image_path }}"
+  cached: "{{ sle_micro.cache.images }}/{{ sle_micro_image_name }}"
