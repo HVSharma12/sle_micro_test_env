@@ -12,7 +12,7 @@ requirements) to quickly get started you can create an sle_micro test env
 by running the `ansible/test_env_create.yml` playbook, like so:
 
 ```shell
-$ ansible-playbook ansible/test_env_create.yml -e sle_micro_image_path=$IMAGEPATH
+$ ansible-playbook ansible/sle_micro_create.yml -e sle_micro_image_path=$IMAGEPATH
 ```
 
 Doing so will automatically setup the `vms.yml` and `vnets.yml` files
@@ -35,7 +35,7 @@ If you want to completely cleanup all of these resources you can run
 the `ansible/test_env_cleanup.yml` playbook as follows:
 
 ```shell
-$ ansible-playbook ansible/test_env_create.yml
+$ ansible-playbook ansible/sle_micro_cleanup.yml
 ```
 
 See below for further details on requirements, using a remote Libvirt
